@@ -24,8 +24,6 @@ The system performs:
 * Object localization and distance estimation
 * Bird's-Eye-View scene generation
 * Multi-object tracking
-* Future trajectory prediction
-* Perception validation and failure analysis
 
 ---
 
