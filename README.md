@@ -2,7 +2,7 @@
 
 An end-to-end autonomous vehicle perception project built on the nuScenes mini dataset. The stack combines camera segmentation, LiDAR projection, camera-LiDAR fusion, 3D localization, BEV mapping, occupancy mapping, multi-object tracking, trajectory prediction, and validation.
 
-<<<<<<< HEAD
+
 The project recreates the core perception pipeline used in modern autonomous driving systems by transforming raw multi-sensor data into a structured understanding of the surrounding environment.
 
 ---
@@ -29,9 +29,9 @@ The system performs:
 ---
 
 # Project Architecture
-=======
+
 The project turns raw synchronized camera and LiDAR data into structured scene understanding:
->>>>>>> e6859ca (Complete autonomous perception stack and final demo)
+
 
 ```text
 nuScenes sample
@@ -367,42 +367,6 @@ The local segmentation weights are expected at:
 notebooks/yolo11n-seg.pt
 ```
 
-## Running The Project
-
-### Run The Final Demo
-
-```bash
-MPLBACKEND=Agg PYTHONPATH=src venv/bin/python scripts/run_final_demo.py
-```
-
-This writes:
-
-```text
-outputs/images/final_demo_fusion.png
-outputs/images/final_demo_trajectories.png
-outputs/images/final_demo_occupancy.png
-outputs/json/final_demo_summary.json
-```
-
-### Run A Source Sanity Check
-
-```bash
-PYTHONPATH=src venv/bin/python -m compileall src scripts
-```
-
-### Run Week 9 Validation Notebook
-
-```bash
-cd notebooks
-MPLCONFIGDIR=/private/tmp/matplotlib-cache \
-PYTHONPATH=../src \
-../venv/bin/jupyter nbconvert \
-  --to notebook \
-  --execute \
-  --ExecutePreprocessor.timeout=240 \
-  --output /private/tmp/week9_executed.ipynb \
-  09_fusion_validation.ipynb
-```
 
 ## Final Demo JSON
 
@@ -458,21 +422,6 @@ Known limitations:
 * Trajectory prediction uses constant velocity, not a behavioral forecasting model.
 * Only the front camera and top LiDAR are used.
 
-## Development Timeline
-
-```text
-Week 2   Camera perception
-Week 3   LiDAR projection
-Week 4   Camera-LiDAR fusion
-Week 5   Object localization
-Week 6   BEV mapping
-Week 7   Geometry validation
-Week 8   Fusion validation
-Week 9   Geometry cleanup with DBSCAN
-Week 10  Multi-object tracking
-Week 11  Trajectory prediction
-Week 12  Final AV perception demo
-```
 
 ## Author
 
