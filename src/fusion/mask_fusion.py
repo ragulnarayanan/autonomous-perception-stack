@@ -13,7 +13,8 @@ def fuse_masks_with_lidar(
     points_cam,
     points_lidar,
     image_shape,
-    min_points=20
+    min_points=10,
+    allowed_classes=None
 ):
     """
     Associate projected LiDAR points
@@ -32,6 +33,16 @@ def fuse_masks_with_lidar(
     H, W = image_shape[:2]
     u_values = np.asarray(u)
     v_values = np.asarray(v)
+
+    if allowed_classes is None:
+        allowed_classes = {
+            "bicycle",
+            "bus",
+            "car",
+            "motorcycle",
+            "person",
+            "truck"
+        }
 
     # ----------------------------------
     # Highest confidence first
@@ -52,6 +63,9 @@ def fuse_masks_with_lidar(
     for det in detections:
 
         if det["mask"] is None:
+            continue
+
+        if det["class"] not in allowed_classes:
             continue
 
         # ----------------------------------
@@ -205,6 +219,11 @@ def fuse_masks_with_lidar(
 
                 "mask":
                 mask,
+
+                "bbox":
+                det.get(
+                    "bbox"
+                ),
 
                 "u":
                 object_u,

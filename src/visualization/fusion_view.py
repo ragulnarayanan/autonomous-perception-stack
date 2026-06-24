@@ -71,8 +71,14 @@ def visualize_fusion(
             )
 
             ax.text(
-                obj["bbox"][0],
-                obj["bbox"][1],
+                max(
+                    obj["bbox"][0],
+                    0
+                ),
+                max(
+                    obj["bbox"][1],
+                    12
+                ),
                 label,
                 fontsize=8,
                 bbox=dict(

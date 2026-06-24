@@ -1,5 +1,9 @@
 import matplotlib.pyplot as plt
 
+from bev.coordinate_conversion import (
+    lidar_to_bev_plot
+)
+
 
 def visualize_tracks(
     tracked_objects
@@ -19,8 +23,9 @@ def visualize_tracks(
 
     for obj in tracked_objects:
 
-        x = obj["centroid"][2]
-        y = obj["centroid"][0]
+        x, y = lidar_to_bev_plot(
+            obj["centroid"]
+        )
 
         plt.scatter(
             x,
@@ -38,11 +43,11 @@ def visualize_tracks(
         )
 
     plt.xlabel(
-        "Forward"
+        "Lateral"
     )
 
     plt.ylabel(
-        "Lateral"
+        "Forward"
     )
 
     plt.title(

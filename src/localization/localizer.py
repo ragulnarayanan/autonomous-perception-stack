@@ -29,9 +29,20 @@ def compute_distance(
 def localize_object(
     obj
 ):
+    points = obj.get(
+        "points_lidar"
+    )
+
+    if points is None:
+        points = obj.get(
+            "points_cam"
+        )
+
+    if points is None:
+        points = obj["points"]
 
     centroid = compute_centroid(
-        obj["points"]
+        points
     )
 
     distance = compute_distance(

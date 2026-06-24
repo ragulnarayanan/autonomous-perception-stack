@@ -20,6 +20,79 @@ from fusion.object_extraction import (
 )
 
 
+def run_fusion_from_detections(
+    nusc,
+    image,
+    cam_data,
+    lidar_data,
+    detections
+):
+    """
+    Run projection, fusion, and object extraction from existing detections.
+    """
+
+    cam_calib = (
+        get_camera_calibration(
+            nusc,
+            cam_data
+        )
+    )
+
+    lidar_calib = (
+        get_lidar_calibration(
+            nusc,
+            lidar_data
+        )
+    )
+
+    u, v, points_cam, pc = (
+        run_lidar_projection_pipeline(
+            nusc,
+            lidar_data,
+            lidar_calib,
+            cam_calib
+        )
+    )
+
+    points_lidar = (
+        pc.points[:3, :]
+    )
+
+    fused_objects = (
+        fuse_masks_with_lidar(
+            detections,
+            u,
+            v,
+            points_cam,
+            points_lidar,
+            image.shape
+        )
+    )
+
+    objects = (
+        extract_object_properties(
+            fused_objects
+        )
+    )
+
+    return {
+        "detections": detections,
+
+        "u": u,
+        "v": v,
+
+        "points_cam": points_cam,
+
+        "points_lidar": points_lidar,
+
+        "pointcloud": pc,
+
+        "fused_objects": fused_objects,
+
+        "objects": objects
+    }
+
+
 def run_fusion_pipeline(
     nusc,
     image,
@@ -44,87 +117,10 @@ def run_fusion_pipeline(
         )
     )
 
-    # --------------------------------
-    # Calibration
-    # --------------------------------
-
-    cam_calib = (
-        get_camera_calibration(
-            nusc,
-            cam_data
-        )
+    return run_fusion_from_detections(
+        nusc,
+        image,
+        cam_data,
+        lidar_data,
+        detections
     )
-
-    lidar_calib = (
-        get_lidar_calibration(
-            nusc,
-            lidar_data
-        )
-    )
-
-    # --------------------------------
-    # Projection
-    # --------------------------------
-
-    u, v, points_cam, pc = (
-        run_lidar_projection_pipeline(
-            nusc,
-            lidar_data,
-            lidar_calib,
-            cam_calib
-        )
-    )
-
-    # --------------------------------
-    # Original LiDAR XYZ
-    # --------------------------------
-
-    points_lidar = (
-        pc.points[:3, :]
-    )
-
-    # --------------------------------
-    # Fusion
-    # --------------------------------
-
-    fused_objects = (
-        fuse_masks_with_lidar(
-            detections,
-            u,
-            v,
-            points_cam,
-            points_lidar,
-            image.shape
-        )
-    )
-
-    # --------------------------------
-    # Object State Estimation
-    # --------------------------------
-
-    objects = (
-        extract_object_properties(
-            fused_objects
-        )
-    )
-
-    # --------------------------------
-    # Return Everything
-    # --------------------------------
-
-    return {
-        "detections": detections,
-
-        "u": u,
-        "v": v,
-
-        "points_cam": points_cam,
-
-        "points_lidar": points_lidar,
-
-        "pointcloud": pc,
-
-        "fused_objects": fused_objects,
-
-        "objects": objects
-    }

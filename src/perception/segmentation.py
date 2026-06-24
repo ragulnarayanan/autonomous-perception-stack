@@ -1,4 +1,32 @@
+from pathlib import Path
+
 from ultralytics import YOLO
+
+
+def resolve_model_path(
+    model_path
+):
+    path = Path(model_path)
+
+    if path.exists():
+        return str(path)
+
+    project_root = (
+        Path(__file__)
+        .resolve()
+        .parents[2]
+    )
+
+    candidates = [
+        project_root / model_path,
+        project_root / "notebooks" / model_path
+    ]
+
+    for candidate in candidates:
+        if candidate.exists():
+            return str(candidate)
+
+    return model_path
 
 
 class SegmentationModel:
@@ -10,7 +38,11 @@ class SegmentationModel:
         self,
         model_path="yolo11n-seg.pt"
     ):
-        self.model = YOLO(model_path)
+        self.model = YOLO(
+            resolve_model_path(
+                model_path
+            )
+        )
 
     def predict(
         self,

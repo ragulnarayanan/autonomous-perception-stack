@@ -13,11 +13,21 @@ class ObjectTracker:
 
     def __init__(
         self,
-        threshold=3.0
+        threshold=5.0,
+        max_missed=2,
+        class_aware=True
     ):
 
         self.threshold = (
             threshold
+        )
+
+        self.max_missed = (
+            max_missed
+        )
+
+        self.class_aware = (
+            class_aware
         )
 
         self.manager = (
@@ -26,10 +36,12 @@ class ObjectTracker:
 
     def update(
         self,
-        objects
+        objects,
+        frame_index=0,
+        timestamp=None
     ):
 
-        tracks = (
+        tracks = list(
             self.manager.get_tracks()
         )
 
@@ -42,7 +54,9 @@ class ObjectTracker:
                 track = (
                     self.manager
                     .create_track(
-                        obj
+                        obj,
+                        frame_index,
+                        timestamp
                     )
                 )
 
@@ -53,6 +67,16 @@ class ObjectTracker:
                         "track_id":
                         track[
                             "track_id"
+                        ],
+
+                        "velocity":
+                        track[
+                            "velocity"
+                        ],
+
+                        "track_age":
+                        track[
+                            "age"
                         ]
                     }
                 )
@@ -63,7 +87,8 @@ class ObjectTracker:
             associate_tracks(
                 objects,
                 tracks,
-                self.threshold
+                self.threshold,
+                self.class_aware
             )
         )
 
@@ -82,7 +107,9 @@ class ObjectTracker:
 
             self.manager.update_track(
                 track_idx,
-                obj
+                obj,
+                frame_index,
+                timestamp
             )
 
             tracked_objects.append(
@@ -92,7 +119,17 @@ class ObjectTracker:
                     "track_id":
                     tracks[
                         track_idx
-                    ]["track_id"]
+                    ]["track_id"],
+
+                    "velocity":
+                    tracks[
+                        track_idx
+                    ]["velocity"],
+
+                    "track_age":
+                    tracks[
+                        track_idx
+                    ]["age"]
                 }
             )
 
@@ -110,7 +147,9 @@ class ObjectTracker:
             track = (
                 self.manager
                 .create_track(
-                    obj
+                    obj,
+                    frame_index,
+                    timestamp
                 )
             )
 
@@ -121,8 +160,41 @@ class ObjectTracker:
                     "track_id":
                     track[
                         "track_id"
+                    ],
+
+                    "velocity":
+                    track[
+                        "velocity"
+                    ],
+
+                    "track_age":
+                    track[
+                        "age"
                     ]
                 }
             )
 
+        matched_tracks = {
+            track_idx
+            for _, track_idx in matches
+        }
+
+        for track_idx, _ in enumerate(
+            tracks
+        ):
+            if track_idx not in matched_tracks:
+                self.manager.mark_missed(
+                    track_idx
+                )
+
+        self.manager.prune_tracks(
+            self.max_missed
+        )
+
         return tracked_objects
+
+    def get_tracks(
+        self
+    ):
+
+        return self.manager.get_tracks()

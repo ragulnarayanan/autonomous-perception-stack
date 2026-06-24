@@ -2,6 +2,10 @@
 
 import matplotlib.pyplot as plt
 
+from bev.coordinate_conversion import (
+    lidar_to_bev_plot
+)
+
 
 def create_bev_map(
     bev_objects,
@@ -24,8 +28,9 @@ def create_bev_map(
 
     for obj in bev_objects:
 
-        x = obj["bev_x"]
-        y = obj["bev_y"]
+        x, y = lidar_to_bev_plot(
+            obj["centroid"]
+        )
 
         plt.scatter(
             x,
@@ -43,11 +48,11 @@ def create_bev_map(
         )
 
     plt.xlabel(
-        "Forward Distance (m)"
+        "Lateral Position (m)"
     )
 
     plt.ylabel(
-        "Lateral Position (m)"
+        "Forward Distance (m)"
     )
 
     plt.title(

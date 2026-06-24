@@ -45,7 +45,8 @@ def compute_distance_matrix(
 def associate_tracks(
     objects,
     tracks,
-    threshold=3.0
+    threshold=5.0,
+    class_aware=True
 ):
     """
     Simple nearest-neighbor association.
@@ -70,6 +71,12 @@ def associate_tracks(
         ):
 
             if track_idx in used_tracks:
+                continue
+
+            if (
+                class_aware
+                and obj.get("class") != track.get("class")
+            ):
                 continue
 
             dist = np.linalg.norm(

@@ -73,10 +73,21 @@ def run_lidar_projection_pipeline(
     )
 
     # Camera -> Image
-    u, v = project_points_to_image(
+    u, v, valid_mask = project_points_to_image(
         points_cam,
-        cam_calib["camera_intrinsic"]
+        cam_calib["camera_intrinsic"],
+        return_mask=True
     )
+
+    points_cam = points_cam[
+        :,
+        valid_mask
+    ]
+
+    pc.points = pc.points[
+        :,
+        valid_mask
+    ]
 
     return (
         u,

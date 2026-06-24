@@ -22,23 +22,64 @@ def compute_dimensions(
     points
 ):
     """
-    LiDAR frame dimensions.
+    Object dimensions from LiDAR points.
 
     X = forward
     Y = left/right
     Z = up/down
+
+    Length and width are computed in an object-aligned
+    ground-plane frame, not directly from raw LiDAR X/Y axes.
     """
 
-    x = points[0]
-    y = points[1]
     z = points[2]
+
+    xy = points[:2].T
+    xy_centered = (
+        xy
+        -
+        np.mean(
+            xy,
+            axis=0
+        )
+    )
+
+    if points.shape[1] >= 2:
+        covariance = np.cov(
+            xy_centered,
+            rowvar=False
+        )
+
+        eigenvalues, eigenvectors = np.linalg.eigh(
+            covariance
+        )
+
+        order = np.argsort(
+            eigenvalues
+        )[::-1]
+
+        axes = eigenvectors[
+            :,
+            order
+        ]
+
+        footprint = xy_centered @ axes
+    else:
+        footprint = xy_centered
+
+    major_axis = footprint[:, 0]
+    minor_axis = footprint[:, 1]
 
     return {
         "length": float(
-            np.max(x) - np.min(x)
+            np.max(major_axis)
+            -
+            np.min(major_axis)
         ),
         "width": float(
-            np.max(y) - np.min(y)
+            np.max(minor_axis)
+            -
+            np.min(minor_axis)
         ),
         "height": float(
             np.max(z) - np.min(z)

@@ -116,26 +116,61 @@ def inspect_height_distribution(
 def find_suspicious_objects(
     objects,
     max_height=5.0,
-    min_points=20
+    min_points=10,
+    max_length=8.0,
+    min_width=0.5,
+    min_height=0.5
 ):
     """
     Find likely fusion errors.
     """
 
-    suspicious = []
+    return [
+        obj
+        for obj in objects
+        if is_suspicious_object(
+            obj,
+            max_height=max_height,
+            min_points=min_points,
+            max_length=max_length,
+            min_width=min_width,
+            min_height=min_height
+        )
+    ]
 
-    for obj in objects:
 
-        dims = obj["dimensions"]
+def is_suspicious_object(
+    obj,
+    max_height=5.0,
+    min_points=10,
+    max_length=8.0,
+    min_width=0.5,
+    min_height=0.5
+):
+    dims = obj["dimensions"]
 
-        if (
-            dims["height"] > max_height
-            or
-            obj["num_points"] < min_points
-        ):
+    return (
+        dims["height"] > max_height
+        or
+        dims["height"] < min_height
+        or
+        dims["length"] > max_length
+        or
+        dims["width"] < min_width
+        or
+        obj["num_points"] < min_points
+    )
 
-            suspicious.append(
-                obj
-            )
 
-    return suspicious
+def filter_valid_objects(
+    objects,
+    **kwargs
+):
+    return [
+        obj
+        for obj in objects
+        if not is_suspicious_object(
+            obj,
+            **kwargs
+        )
+    ]

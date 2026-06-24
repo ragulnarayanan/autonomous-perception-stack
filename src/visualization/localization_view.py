@@ -72,6 +72,10 @@ def visualize_localization(
 
 import matplotlib.pyplot as plt
 
+from bev.coordinate_conversion import (
+    lidar_to_bev_plot
+)
+
 
 def plot_localized_objects(
     objects,
@@ -92,8 +96,9 @@ def plot_localized_objects(
 
     for obj in objects:
 
-        x = obj["position"]["x"]
-        y = obj["position"]["y"]
+        x, y = lidar_to_bev_plot(
+            obj["centroid"]
+        )
 
         plt.scatter(
             x,
@@ -111,11 +116,11 @@ def plot_localized_objects(
         )
 
     plt.xlabel(
-        "Forward Distance (m)"
+        "Lateral Distance (m)"
     )
 
     plt.ylabel(
-        "Lateral Distance (m)"
+        "Forward Distance (m)"
     )
 
     plt.title(

@@ -1,7 +1,7 @@
 # src/bev/scene_builder.py
 
 from bev.coordinate_conversion import (
-    camera_to_bev
+    lidar_to_bev
 )
 
 
@@ -16,7 +16,7 @@ def build_bev_scene(
         centroid = obj["centroid"]
 
         bev_x, bev_y = (
-            camera_to_bev(
+            lidar_to_bev(
                 centroid
             )
         )
